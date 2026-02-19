@@ -1,0 +1,27 @@
+---  # Start of YAML document
+
+- name: Install and run Nginx on server nodes  # Name of the play
+  hosts: server_nodes  # Target group defined in your inventory file
+  become: true  # Run all tasks with sudo (root privileges)
+
+  tasks:  
+
+    - name: Check connectivity  
+      ping:  # Ansible ping module (checks SSH + Python availability, not ICMP ping)
+
+    - name: Update apt cache 
+      apt:  # Uses apt module (for Debian/Ubuntu systems)
+        update_cache: yes  # Equivalent to running "apt update"
+      when: ansible_os_family == "Debian"  
+      # Runs this task only if the system is Debian-based
+
+    - name: Install nginx  
+      package:  # Generic package module (works across multiple Linux distros)
+        name: nginx  # Package name
+        state: present  # Ensure nginx is installed (idempotent)
+
+    - name: Ensure nginx is running and enabled 
+      service: 
+        name: nginx  
+        state: started  # Make sure nginx is currently running
+        enabled: true  # Enable nginx to start automatically on boot
