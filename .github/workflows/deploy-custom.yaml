@@ -1,0 +1,34 @@
+name: Deploy Custom Nginx
+
+on:
+  workflow_dispatch:   # Manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Create SSH Key File
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" | base64 -d > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Add ec2 host keys
+        run: |
+          mkdir -p ~/.ssh          
+          for ip in $(grep ansible_host inventory.yaml | awk '{print $2}'); do
+            ssh-keyscan -H $ip >> ~/.ssh/known_hosts
+          done
+
+      - name: Run Ansible Playbook (Custom Nginx)
+        run: |
+          ansible-playbook -i inventory.yaml install-nginx-custom.yaml \
+          --private-key private_key.pem
