@@ -1,0 +1,30 @@
+--- # Indicates the start of a YAML document
+
+- name: Install and Configure Nginx on EC2 Nodes
+  hosts: server_nodes
+  become: true # Use sudo (run tasks with elevated/root privileges)
+
+  tasks: # List of tasks to execute on the target hosts
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes # Runs "apt update" to refresh package list
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present # Ensure nginx is installed (idempotent)
+
+    - name: Copy custom index.html
+      copy: # Using the copy module to transfer a file
+        src: index.html # Source file from your local Ansible project directory
+        dest: /var/www/html/index.html # Destination path on the remote EC2 server
+        owner: www-data # Set file owner to www-data (default nginx user on Ubuntu)s
+        group: www-data
+        mode: '0644'
+
+    - name: Ensure nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: true
