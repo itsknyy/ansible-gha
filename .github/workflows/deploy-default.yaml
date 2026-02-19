@@ -21,6 +21,11 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
+      - name: Add ec2 host keys
+        run: |
+          mkdir -p ~/.ssh          
+          ssh-keyscan -H YOUR_EC2_PUBLIC_IP >> ~/.ssh/known_hosts
+          
       - name: Run Ansible Playbook (Default Nginx)
         run: |
           ansible-playbook -i inventory.yaml install-nginx-default.yaml \
