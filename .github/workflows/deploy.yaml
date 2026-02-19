@@ -23,5 +23,5 @@ jobs:
 
       - name: Run Ansible Playbook (Default Nginx)
         run: |
-          ansible-playbook -i inventory.yaml install_nginx_default.yaml \
+          ansible-playbook -i inventory.yaml install-nginx-default.yaml \
           --private-key private_key.pem
